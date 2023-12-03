@@ -5,6 +5,8 @@ import { User } from './entities/user.entity';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
+import * as bcryptjs from 'bcryptjs';
+
 @Injectable()
 export class AuthService {
 
@@ -15,11 +17,22 @@ export class AuthService {
   }
 
 
-  create(createAuthDto: CreateUserDto): Promise<User> {
+  async create(createAuthDto: CreateUserDto): Promise<User> {
     //console.log( createAuthDto );
     try {
-     const newUser = new this.userModel( createAuthDto);
-     return newUser.save();
+
+     const { password, ...userData} = createAuthDto;
+
+     const newUser = new this.userModel( {
+      password: bcryptjs.hashSync( password, 10),
+      ...userData
+     });
+
+     await newUser.save();
+     const {password:_, ...user} = newUser.toJSON();
+
+     return user;
+
     } catch (error) {
       if( error.code === 11000){
          throw new BadRequestException(`${ createAuthDto.email } already exist!`)
