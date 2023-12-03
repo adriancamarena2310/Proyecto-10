@@ -9,6 +9,7 @@ import * as bcryptjs from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt-payload';
+import { LoginResponse } from './interfaces/login-response';
 
 @Injectable()
 export class AuthService {
@@ -62,7 +63,7 @@ export class AuthService {
     return `This action removes a #${id} auth`;
   }
 
-  async login( loginDto: LoginDto){
+  async login( loginDto: LoginDto): Promise<LoginResponse>{
 
     const {email, password} = loginDto;
 
@@ -89,4 +90,12 @@ export class AuthService {
      const token = this.jwtService.signAsync(payload)
      return token;
   }
+
+  async register(): Promise<LoginResponse>{
+    
+    return{
+      user: user,
+      token: 'ABC'
+    }
+ }
 }
