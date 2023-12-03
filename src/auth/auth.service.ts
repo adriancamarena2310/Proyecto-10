@@ -7,13 +7,16 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import * as bcryptjs from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './interfaces/jwt-payload';
 
 @Injectable()
 export class AuthService {
 
   constructor( 
     @InjectModel( User.name )
-     private userModel: Model<User>,){
+     private userModel: Model<User>,
+     private jwtService: JwtService){
      
   }
 
@@ -77,8 +80,13 @@ export class AuthService {
 
 
     return {
-       ...rest,
-       token: 'ABC-123'
+      user: rest,
+      token: this.getJwtToken({id: user.id}),
     }
+  }
+
+  getJwtToken( payload: JwtPayload){
+     const token = this.jwtService.signAsync(payload)
+     return token;
   }
 }
