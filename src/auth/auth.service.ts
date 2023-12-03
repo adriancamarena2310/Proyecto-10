@@ -10,6 +10,7 @@ import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt-payload';
 import { LoginResponse } from './interfaces/login-response';
+import { RegisterUserDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -87,15 +88,17 @@ export class AuthService {
   }
 
   getJwtToken( payload: JwtPayload){
-     const token = this.jwtService.signAsync(payload)
-     return token;
+     const token = this.jwtService.signAsync(payload);
+     return token + '';
   }
 
-  async register(): Promise<LoginResponse>{
+  async register( registerDto: RegisterUserDto ): Promise<LoginResponse>{
     
+    const user = await this.create( registerDto );
+
     return{
       user: user,
-      token: 'ABC'
+      token: this.getJwtToken({id: user._id})
     }
  }
 }
